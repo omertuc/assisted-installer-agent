@@ -3,7 +3,7 @@ module github.com/openshift/assisted-installer-agent
 go 1.13
 
 require (
-	github.com/go-openapi/strfmt v0.19.11
+	github.com/go-openapi/strfmt v0.20.0
 	github.com/go-openapi/swag v0.19.12
 	github.com/google/uuid v1.1.3
 	github.com/hashicorp/go-multierror v1.1.0
