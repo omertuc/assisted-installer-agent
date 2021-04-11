@@ -361,7 +361,7 @@ func prepareDisksTest(dependencies *util.MockIDependencies, numDisks int) (*ghw.
 	return blockInfo, expectedDisks
 }
 
-var _ = Describe("Disks test", func() {
+var _ = FDescribe("Disks test", func() {
 	var dependencies *util.MockIDependencies
 
 	BeforeEach(func() {
@@ -799,6 +799,25 @@ var _ = Describe("Disks test", func() {
 			disk := ret[0]
 			Ω(disk.ByID).Should(BeEmpty())
 			Ω(disk.ID).Should(Equal(disk.ByPath))
+		})
+
+		It("Duplicate busType", func() {
+			mockGetWWNCallForSuccess(dependencies, make(map[string]string))
+			sda := createSDADisk()
+			sdd := createSDADisk()
+			sdd.Name = "sdd"
+			mockAllForSuccess(dependencies, sda, sdd)
+			path := fmt.Sprintf("/dev/disk/by-path/%s", sda.BusPath)
+			util.DeleteExpectedMethod(&dependencies.Mock, "Stat", path)
+			util.DeleteExpectedMethod(&dependencies.Mock, "Stat", path)
+			ret := GetDisks(dependencies)
+			Ω(ret).Should(HaveLen(2))
+			disk := ret[0]
+			Ω(disk.ByID).Should(BeEmpty())
+			Ω(disk.ID).Should(Equal(disk.Path))
+			disk = ret[1]
+			Ω(disk.ByID).Should(BeEmpty())
+			Ω(disk.ID).Should(Equal(disk.Path))
 		})
 	})
 })
