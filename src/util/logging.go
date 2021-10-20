@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/sirupsen/logrus"
-
+	"github.com/openshift/assisted-installer-agent/src/config"
 	"github.com/openshift/assisted-installer-agent/pkg/journalLogger"
 )
 
@@ -66,6 +66,7 @@ func setLogging(logger *logrus.Logger, journalWriter journalLogger.IJournalWrite
 	if journalLogging {
 		journalLogger.SetJournalLogging(logger, journalWriter, map[string]interface{}{
 			"TAG": "agent",
+			"SWARM": config.GlobalAgentConfig.HostID,
 		})
 	}
 }

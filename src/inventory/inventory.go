@@ -8,7 +8,7 @@ import (
 	"github.com/openshift/assisted-service/models"
 )
 
-func ReadInventory() *models.Inventory {
+func ReadInventory(forceMac string) *models.Inventory {
 	d := util.NewDependencies()
 	ret := models.Inventory{
 		BmcAddress:   GetBmcAddress(d),
@@ -18,7 +18,7 @@ func ReadInventory() *models.Inventory {
 		Disks:        GetDisks(d),
 		Gpus:         GetGPUs(d),
 		Hostname:     GetHostname(d),
-		Interfaces:   GetInterfaces(d),
+		Interfaces:   GetInterfaces(d, forceMac),
 		Memory:       GetMemory(d),
 		SystemVendor: GetVendor(d),
 		Timestamp:    time.Now().Unix(),
@@ -28,8 +28,8 @@ func ReadInventory() *models.Inventory {
 	return &ret
 }
 
-func CreateInventoryInfo() []byte {
-	in := ReadInventory()
+func CreateInventoryInfo(forceMac string) []byte {
+	in := ReadInventory(forceMac)
 	b, _ := json.Marshal(&in)
 	return b
 }

@@ -1,7 +1,7 @@
 package inventory
 
 import (
-	"net"
+	// "net"
 	"regexp"
 	"strconv"
 	"strings"
@@ -40,19 +40,19 @@ func (b *bmc) getIsEnabled(value interface{}) bool {
 }
 
 func (b *bmc) getBmcAddress() string {
-	for ch := 1; ch <= MaxIpmiChannel; ch++ {
-		ret := b.getIpForChannnel(ch)
-		if ret == "" {
-			continue
-		}
-		ip := net.ParseIP(ret)
-		if ip == nil {
-			continue
-		}
-		if ret != "0.0.0.0" {
-			return ret
-		}
-	}
+	// for ch := 1; ch <= MaxIpmiChannel; ch++ {
+	// 	ret := b.getIpForChannnel(ch)
+	// 	if ret == "" {
+	// 		continue
+	// 	}
+	// 	ip := net.ParseIP(ret)
+	// 	if ip == nil {
+	// 		continue
+	// 	}
+	// 	if ret != "0.0.0.0" {
+	// 		return ret
+	// 	}
+	// }
 	return "0.0.0.0"
 }
 
@@ -120,24 +120,24 @@ func (b *bmc) getAddrMode(ch int) string {
 }
 
 func (b *bmc) getBmcV6Address() string {
-	for ch := 1; ch <= MaxIpmiChannel; ch++ {
-		addrMode := b.getAddrMode(ch)
-		if addrMode == "" {
-			continue
-		}
-		address := b.getV6Address(ch, "dynamic")
-		if address == "" {
-			address = b.getV6Address(ch, "static")
-		}
-		if address == "" {
-			continue
-		}
-		ip, _, err := net.ParseCIDR(address)
-		if err != nil {
-			continue
-		}
-		return ip.String()
-	}
+	// for ch := 1; ch <= MaxIpmiChannel; ch++ {
+	// 	addrMode := b.getAddrMode(ch)
+	// 	if addrMode == "" {
+	// 		continue
+	// 	}
+	// 	address := b.getV6Address(ch, "dynamic")
+	// 	if address == "" {
+	// 		address = b.getV6Address(ch, "static")
+	// 	}
+	// 	if address == "" {
+	// 		continue
+	// 	}
+	// 	ip, _, err := net.ParseCIDR(address)
+	// 	if err != nil {
+	// 		continue
+	// 	}
+	// 	return ip.String()
+	// }
 	return "::/0"
 }
 

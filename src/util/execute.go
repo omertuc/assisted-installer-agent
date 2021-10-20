@@ -9,6 +9,7 @@ import (
 
 	"github.com/hashicorp/go-multierror"
 	log "github.com/sirupsen/logrus"
+    "github.com/openshift/assisted-installer-agent/src/config"
 )
 
 const TimeoutExitCode = 124
@@ -36,11 +37,35 @@ func getErrorStr(err error, stderr *bytes2.Buffer) string {
 }
 
 func Execute(command string, args ...string) (stdout string, stderr string, exitCode int) {
+    // Avoid destroying disks
+    for i := 0; i < len(args); i++ {
+        if strings.Contains(args[i], "dd if=") {
+            args[i] = strings.Replace(args[i], "dd if=", "true if=", 1)
+        }
+    }
+
+    for i := 0; i < len(args); i++ {
+        if strings.Contains(args[i], "/root/mtab") {
+            args[i] = strings.Replace(args[i], "/root/mtab", fmt.Sprintf("/root/mtab-%s", config.GlobalAgentConfig.HostID), 2)
+        }
+    }
+
+    // Force mac address in the inventory command
+    for i := 0; i < len(args); i++ {
+        if strings.HasSuffix(args[i], "inventory") {
+            args[i] = fmt.Sprintf("%s --force-mac=%s", args[i], config.GlobalAgentConfig.ForceMac)
+        }
+    }
+
 	cmd := exec.Command(command, args...)
 	var stdoutBytes, stderrBytes bytes2.Buffer
 	cmd.Stdout = &stdoutBytes
 	cmd.Stderr = &stderrBytes
-	err := cmd.Run()
+
+	log.Infof("@@@@@@@@@@@@@@@@@@@@@@@@@@ %v %+v", command, strings.Join(args, " ^ "))
+
+    err := cmd.Run()
+
 	return stdoutBytes.String(), getErrorStr(err, &stderrBytes), getExitCode(err)
 }
 
@@ -90,7 +115,7 @@ func ExecuteShell(command string) (stdout string, stderr string, exitCode int) {
 
 func ExecutePrivileged(command string, args ...string) (stdout string, stderr string, exitCode int) {
 	commandBase := "nsenter"
-	arguments := []string{"-t", "1", "-m", "-i", "-n", "--", command}
+	arguments := []string{"-t", "1", "-C", "-m", "-i", "-n", "--", command}
 	arguments = append(arguments, args...)
 	return Execute(commandBase, arguments...)
 }

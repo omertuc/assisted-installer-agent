@@ -2,7 +2,6 @@ package commands
 
 import (
 	"fmt"
-	"io"
 	"net/http"
 	"os"
 	"strings"
@@ -118,7 +117,7 @@ func (s *stepSession) handleSteps(steps *models.Steps) {
 			continue
 		}
 
-		go func(step *models.Step) {
+		func(step *models.Step) {
 			if code, err := s.diagnoseSystem(); code != Undetected {
 				log.Errorf("System issue detected before running step: <%s>, command: <%s>, args: <%v>: %s - stopping the execution", step.StepID, step.Command, step.Args, err.Error())
 				s.sendStepReply(s.createStepReply(step.StepType, step.StepID, "", err.Error(), int(code)))
@@ -143,28 +142,28 @@ func (s *stepSession) handleSteps(steps *models.Steps) {
 // This is in order to detect and report known problems otherwise manifest as confusing error messages or stuck the whole system in the steps themselves.
 // One common example of that is virtual media disconnection.
 func (s *stepSession) diagnoseSystem() (errorCode, error) {
-	source, err := s.getMountpointSourceDeviceFile()
+	// source, err := s.getMountpointSourceDeviceFile()
 
-	if err != nil {
-		log.Warn(err)
-		return Undetected, nil
-	}
+	// if err != nil {
+	// 	log.Warn(err)
+	// 	return Undetected, nil
+	// }
 
-	if source == "" {
-		return Undetected, nil
-	}
+	// if source == "" {
+	// 	return Undetected, nil
+	// }
 
-	file, err := os.Open(source)
-	if err != nil {
-		return MediaDisconnected, errors.Wrap(err, "cannot access the media (ISO) - media was likely disconnected")
-	}
+	// file, err := os.Open(source)
+	// if err != nil {
+	// 	return MediaDisconnected, errors.Wrap(err, "cannot access the media (ISO) - media was likely disconnected")
+	// }
 
-	defer file.Close()
+	// defer file.Close()
 
-	_, err = io.ReadFull(file, make([]byte, 2))
-	if err != nil {
-		return MediaDisconnected, errors.Wrap(err, "cannot read from the media (ISO) - media was likely disconnected")
-	}
+	// _, err = io.ReadFull(file, make([]byte, 2))
+	// if err != nil {
+	// 	return MediaDisconnected, errors.Wrap(err, "cannot read from the media (ISO) - media was likely disconnected")
+	// }
 
 	return Undetected, nil
 }

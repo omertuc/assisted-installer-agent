@@ -81,22 +81,33 @@ func getFlags(flags net.Flags) []string {
 	}
 }
 
-func (i *interfaces) getInterfaces() []*models.Interface {
+func (i *interfaces) getInterfaces(forceMac string) []*models.Interface {
 	ret := make([]*models.Interface, 0)
 	ins, err := i.dependencies.Interfaces()
 	if err != nil {
 		logrus.WithError(err).Warnf("Retrieving interfaces")
 		return ret
 	}
+
+    interfacesFound := 0
 	for _, in := range ins {
 		if !(in.IsPhysical() || in.IsBonding() || in.IsVlan()) {
 			continue
 		}
+
+        macAddress := in.HardwareAddr().String()
+		if interfacesFound == 0 && forceMac != "" {
+		    // If the user requested it, override the mac address of the first interface to the
+		    // mac address configured by the user
+            macAddress = forceMac
+        }
+
+        interfacesFound += 1
 		rec := models.Interface{
 			HasCarrier:    i.hasCarrier(in.Name()),
 			IPV4Addresses: make([]string, 0),
 			IPV6Addresses: make([]string, 0),
-			MacAddress:    in.HardwareAddr().String(),
+			MacAddress:    macAddress,
 			Name:          in.Name(),
 			Mtu:           int64(in.MTU()),
 			Biosdevname:   i.getBiosDevname(in.Name()),
@@ -128,8 +139,8 @@ func (i *interfaces) getInterfaces() []*models.Interface {
 	return ret
 }
 
-func GetInterfaces(dependencies util.IDependencies) []*models.Interface {
-	return newInterfaces(dependencies).getInterfaces()
+func GetInterfaces(dependencies util.IDependencies, forceMac string) []*models.Interface {
+	return newInterfaces(dependencies).getInterfaces(forceMac)
 }
 
 func setV6PrefixesForAddresses(interfaces []*models.Interface, dependencies util.IDependencies) {

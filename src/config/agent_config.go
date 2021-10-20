@@ -12,8 +12,10 @@ const agentVersionTagDelimiter = ":"
 
 var GlobalAgentConfig struct {
 	ConnectivityConfig
-	IntervalSecs int
-	HostID       string
+	IntervalSecs     int
+	HostID           string
+	ForceMac         string
+	ContainerStorage string
 	LoggingConfig
 }
 
@@ -33,6 +35,8 @@ func ProcessArgs() {
 	flag.StringVar(&ret.CACertificatePath, "cacert", "", "Path to custom CA certificate in PEM format")
 	flag.BoolVar(&ret.InsecureConnection, "insecure", false, "Do not validate TLS certificate")
 	flag.StringVar(&ret.HostID, "host-id", "", "Host identification")
+	flag.StringVar(&ret.ForceMac, "force-mac", "", "Force agent to report a particular mac address in its first network interface")
+	flag.StringVar(&ret.ContainerStorage, "container-storage", "", "Container storage configuration file to tell next step runner to use")
 	h := flag.Bool("help", false, "Help message")
 	flag.Parse()
 	if h != nil && *h {

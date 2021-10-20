@@ -1,8 +1,8 @@
 include .env
 export
 
-TAG := $(or $(TAG),latest)
-ASSISTED_INSTALLER_AGENT := $(or $(ASSISTED_INSTALLER_AGENT),quay.io/ocpmetal/assisted-installer-agent:$(TAG))
+TAG := $(or $(TAG),swarm)
+ASSISTED_INSTALLER_AGENT := $(or $(ASSISTED_INSTALLER_AGENT),quay.io/otuchfel/assisted-installer-agent:$(TAG))
 
 export ROOT_DIR = $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 BIN = $(ROOT_DIR)/build
@@ -36,7 +36,7 @@ build-%: $(BIN) src/$* #lint
 	CGO_ENABLED=0 go build -o $(BIN)/$* src/$*/main/main.go
 
 build-image: unit-test
-	docker build ${CONTAINER_BUILD_PARAMS} -f Dockerfile.assisted_installer_agent . -t $(ASSISTED_INSTALLER_AGENT)
+	podman build ${CONTAINER_BUILD_PARAMS} -f Dockerfile.assisted_installer_agent . -t $(ASSISTED_INSTALLER_AGENT)
 
 push: build-image subsystem
 	docker push $(ASSISTED_INSTALLER_AGENT)

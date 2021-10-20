@@ -2,6 +2,7 @@ package main
 
 import (
 	"time"
+	"fmt"
 
 	"github.com/openshift/assisted-installer-agent/src/commands"
 	"github.com/openshift/assisted-installer-agent/src/config"
@@ -9,7 +10,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-const defaultRetryDelay = 1 * time.Hour
+const defaultRetryDelay = 1 * time.Minute
 
 func main() {
 	config.ProcessArgs()
@@ -22,6 +23,21 @@ func main() {
 			time.Sleep(defaultRetryDelay)
 			continue
 		}
+
+        firstEnvArgIndex := -1
+        for i, arg := range(stepRunnerCommand.Args) {
+            if arg == "--env" {
+                firstEnvArgIndex = i
+            }
+        }
+
+        stepRunnerCommand.Args = append(
+            stepRunnerCommand.Args[:firstEnvArgIndex],
+            append([]string{fmt.Sprintf("--env=CONTAINERS_STORAGE_CONF=%s", config.GlobalAgentConfig.ContainerStorage)},
+            stepRunnerCommand.Args[firstEnvArgIndex:]...)...
+        )
+
+		stepRunnerCommand.Args = append(stepRunnerCommand.Args, fmt.Sprintf("--force-mac=%s", config.GlobalAgentConfig.ForceMac))
 
 		if err := commands.StartStepRunner(stepRunnerCommand.Command, stepRunnerCommand.Args...); err != nil {
 
