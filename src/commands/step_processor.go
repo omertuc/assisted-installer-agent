@@ -143,6 +143,11 @@ func (s *stepSession) handleSteps(steps *models.Steps) {
 // This is in order to detect and report known problems otherwise manifest as confusing error messages or stuck the whole system in the steps themselves.
 // One common example of that is virtual media disconnection.
 func (s *stepSession) diagnoseSystem() (errorCode, error) {
+	if config.GlobalDryRunConfig.DryRunEnabled {
+		// diagnoseSystem is not necessary in dry mode
+		return Undetected, nil
+	}
+
 	source, err := s.getMountpointSourceDeviceFile()
 
 	if err != nil {

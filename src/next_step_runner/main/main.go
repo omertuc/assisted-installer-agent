@@ -9,7 +9,8 @@ import (
 
 func main() {
 	config.ProcessArgs()
-	util.SetLogging("agent_next_step_runner", config.GlobalAgentConfig.TextLogging, config.GlobalAgentConfig.JournalLogging)
+	config.ProcessDryRunArgs()
+	util.SetLogging("agent_next_step_runner", config.GlobalAgentConfig.TextLogging, config.GlobalAgentConfig.JournalLogging, config.GlobalDryRunConfig.ForcedHostID)
 	commands.ProcessSteps()
 	log.Info("next step runner exiting")
 }

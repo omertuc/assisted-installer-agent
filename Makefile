@@ -57,7 +57,7 @@ ifeq ($(CI), true)
 endif
 
 unit-test:
-	$(MAKE) _test TEST_SCENARIO=unit TIMEOUT=30m TEST="$(or $(TEST),$(shell go list ./... | grep -v subsystem))" || (docker kill postgres && /bin/false)
+	$(MAKE) _test TEST_SCENARIO=unit TIMEOUT=30m TEST="$(or $(TEST),$(shell go list ./... | grep -v subsystem))" || (docker kill postgres || /bin/true)
 
 subsystem: build-image
 	-docker image rm subsystem_agent
