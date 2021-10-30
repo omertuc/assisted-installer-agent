@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -234,15 +235,20 @@ func (s *stepSession) processSingleSession() (int64, string) {
 	return result.NextInstructionSeconds, *result.PostStepAction
 }
 
-func ProcessSteps() {
+func ProcessSteps(ctx context.Context) {
 	var nextRunIn int64
 	for afterStep := ""; afterStep != models.StepsPostStepActionExit; {
-		s := newSession()
-		nextRunIn, afterStep = s.processSingleSession()
-		if nextRunIn == -1 {
-			// sleep forever
-			select {}
+		select {
+		case <-ctx.Done():
+			return
+		default:
+			s := newSession()
+			nextRunIn, afterStep = s.processSingleSession()
+			if nextRunIn == -1 {
+				// sleep forever
+				select {}
+			}
+			time.Sleep(time.Duration(nextRunIn) * time.Second)
 		}
-		time.Sleep(time.Duration(nextRunIn) * time.Second)
 	}
 }

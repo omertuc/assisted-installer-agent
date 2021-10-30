@@ -11,34 +11,33 @@ import (
 
 const defaultRetryDelay = 1 * time.Hour
 
-// Smaller delay to use for dry-run agents, as they're only used in testing, no such large delay is needed
-const dryRunRetryDelay = 1 * time.Minute
-
 func main() {
 	config.ProcessArgs()
 	config.ProcessDryRunArgs()
 	util.SetLogging("agent_registration", config.GlobalAgentConfig.TextLogging, config.GlobalAgentConfig.JournalLogging, config.GlobalDryRunConfig.ForcedHostID)
 
-	retryDelay := defaultRetryDelay
-	if config.GlobalDryRunConfig.DryRunEnabled {
-		retryDelay = dryRunRetryDelay
-	}
-
 	for {
 		stepRunnerCommand := commands.RegisterHostWithRetry()
 		if stepRunnerCommand == nil {
-			log.Errorf("Incompatible server version, going to retry in %s", retryDelay)
-			time.Sleep(retryDelay)
+			log.Errorf("Incompatible server version, going to retry in %s", defaultRetryDelay)
+			time.Sleep(defaultRetryDelay)
 			continue
 		}
 
 		if err := commands.StartStepRunner(stepRunnerCommand.Command, stepRunnerCommand.Args...); err != nil {
-
 			var reRegistrerDelay time.Duration
 			if stepRunnerCommand.RetrySeconds > 0 {
 				reRegistrerDelay = time.Duration(stepRunnerCommand.RetrySeconds) * time.Second
 			} else {
-				reRegistrerDelay = retryDelay
+				reRegistrerDelay = defaultRetryDelay
+			}
+
+			if config.GlobalDryRunConfig.DryRunEnabled {
+				// Check if the step runner died just because the installer signaled fake reboot
+				if config.DryRebootHappened() {
+					log.Infof("Dry reboot happened, exiting")
+					return
+				}
 			}
 
 			log.WithError(err).Errorf("Next step runner has crashed and will be restarted in %s", reRegistrerDelay)
