@@ -25,16 +25,6 @@ var DefaultDryRunConfig DryRunConfig = DryRunConfig{
 	ForcedMacAddress: "",
 }
 
-func DryRebootHappened() bool {
-	// The dry run installer creates this file on "Reboot" (instead of actually rebooting)
-	// We use this as a signal that we should terminate as well
-	if _, err := os.Stat(GlobalDryRunConfig.FakeRebootMarkerPath); err == nil {
-		return true
-	}
-
-	return false
-}
-
 func ProcessDryRunArgs() {
 	err := envconfig.Process("dryconfig", &DefaultDryRunConfig)
 	if err != nil {

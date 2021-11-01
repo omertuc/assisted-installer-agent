@@ -23,7 +23,7 @@ func main() {
 	if config.GlobalDryRunConfig.DryRunEnabled {
 		log.Info(`Dry run enabled, will cancel goroutine on fake "reboot"`)
 		for {
-			if config.DryRebootHappened() {
+			if util.DryRebootHappened() {
 				log.Info("Dry reboot happened, exiting")
 				cancel()
 				break

@@ -34,7 +34,7 @@ func main() {
 
 			if config.GlobalDryRunConfig.DryRunEnabled {
 				// Check if the step runner died just because the installer signaled fake reboot
-				if config.DryRebootHappened() {
+				if util.DryRebootHappened() {
 					log.Infof("Dry reboot happened, exiting")
 					return
 				}
