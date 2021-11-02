@@ -101,7 +101,7 @@ func pullImage(executer ImageAvailabilityDependencies, pullTimeoutSeconds int64,
 
 func handleImageAvailability(executer ImageAvailabilityDependencies, log logrus.FieldLogger, pullTimeoutSeconds int64, image string) *models.ContainerImageAvailability {
 	if config.GlobalDryRunConfig.DryRunEnabled {
-		log.Infof("Running in dry mode - skipping image availability test, returning fake results"
+		log.Infof("Running in dry mode - skipping image availability test, returning fake results")
 		return getDryModeContainerImageAvailability(image)
 	}
 
