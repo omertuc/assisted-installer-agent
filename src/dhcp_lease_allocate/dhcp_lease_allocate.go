@@ -18,7 +18,7 @@ import (
 
 const configPath string = "/etc/keepalived"
 
-//go:generate mockery -name Dependencies -inpkg
+//go:generate mockery --name Dependencies --inpackage
 type Dependencies interface {
 	Execute(command string, args ...string) (stdout string, stderr string, exitCode int)
 	WriteFile(filename string, data []byte, perm os.FileMode) error

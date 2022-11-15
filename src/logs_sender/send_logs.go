@@ -37,7 +37,7 @@ const (
 	lvdisplay                    = "/usr/sbin/lvdisplay"
 )
 
-//go:generate mockery -name LogsSender -inpkg
+//go:generate mockery --name LogsSender --inpackage
 type LogsSender interface {
 	Execute(command string, args ...string) (stdout string, stderr string, exitCode int)
 	ExecutePrivileged(command string, args ...string) (stdout string, stderr string, exitCode int)
