@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"os"
 	"strings"
 	"sync"
@@ -51,7 +50,7 @@ func newSession(cancel context.CancelFunc, agentConfig *config.AgentConfig, tool
 	ret := stepSession{
 		InventorySession:  *invSession,
 		cancel:            cancel,
-		serviceAPI:        newServiceAPI(agentConfig),
+		serviceAPI:        NewServiceAPI(agentConfig),
 		toolRunnerFactory: toolRunnerFactory,
 		agentConfig:       agentConfig,
 		stepCache:         c,
@@ -161,33 +160,33 @@ func (s *stepSession) handleSteps(steps *models.Steps) {
 // This is in order to detect and report known problems otherwise manifest as confusing error messages or stuck the whole system in the steps themselves.
 // One common example of that is virtual media disconnection.
 func (s *stepSession) diagnoseSystem() (errorCode, error) {
-	if s.agentConfig.DryRunEnabled {
-		// diagnoseSystem is not necessary in dry mode
-		return Undetected, nil
-	}
+	// if s.agentConfig.DryRunEnabled {
+	// 	// diagnoseSystem is not necessary in dry mode
+	// 	return Undetected, nil
+	// }
 
-	source, err := s.getMountpointSourceDeviceFile()
+	// source, err := s.getMountpointSourceDeviceFile()
 
-	if err != nil {
-		log.Warn(err)
-		return Undetected, nil
-	}
+	// if err != nil {
+	// 	log.Warn(err)
+	// 	return Undetected, nil
+	// }
 
-	if source == "" {
-		return Undetected, nil
-	}
+	// if source == "" {
+	// 	return Undetected, nil
+	// }
 
-	file, err := os.Open(source)
-	if err != nil {
-		return MediaDisconnected, errors.Wrap(err, "cannot access the media (ISO) - media was likely disconnected")
-	}
+	// file, err := os.Open(source)
+	// if err != nil {
+	// 	return MediaDisconnected, errors.Wrap(err, "cannot access the media (ISO) - media was likely disconnected")
+	// }
 
-	defer file.Close()
+	// defer file.Close()
 
-	_, err = io.ReadFull(file, make([]byte, 2))
-	if err != nil {
-		return MediaDisconnected, errors.Wrap(err, "cannot read from the media (ISO) - media was likely disconnected")
-	}
+	// _, err = io.ReadFull(file, make([]byte, 2))
+	// if err != nil {
+	// 	return MediaDisconnected, errors.Wrap(err, "cannot read from the media (ISO) - media was likely disconnected")
+	// }
 
 	return Undetected, nil
 }

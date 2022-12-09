@@ -18,7 +18,7 @@ func RegisterHostWithRetry(agentConfig *config.AgentConfig, log logrus.FieldLogg
 		if err != nil {
 			logrus.Fatalf("Failed to initialize connection: %e", err)
 		}
-		serviceAPI := newServiceAPI(agentConfig)
+		serviceAPI := NewServiceAPI(agentConfig)
 
 		registerResult, err := serviceAPI.RegisterHost(s)
 		if err == nil {

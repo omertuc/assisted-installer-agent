@@ -113,14 +113,14 @@ type Host struct {
 	Kind *string `json:"kind"`
 
 	// logs collected at
-	// Format: datetime
+	// Format: date-time
 	LogsCollectedAt strfmt.DateTime `json:"logs_collected_at,omitempty" gorm:"type:timestamp with time zone"`
 
 	// The progress of log collection or empty if logs are not applicable
 	LogsInfo LogsState `json:"logs_info,omitempty" gorm:"type:varchar(2048)"`
 
 	// logs started at
-	// Format: datetime
+	// Format: date-time
 	LogsStartedAt strfmt.DateTime `json:"logs_started_at,omitempty" gorm:"type:timestamp with time zone"`
 
 	// machine config pool name
@@ -135,6 +135,9 @@ type Host struct {
 
 	// The configured NTP sources on the host.
 	NtpSources string `json:"ntp_sources,omitempty" gorm:"type:text"`
+
+	// The host's current virtual media preload status
+	PreloadStatus PreloadStatus `json:"preload_status,omitempty" gorm:"type:varchar(2048)"`
 
 	// progress
 	Progress *HostProgressInfo `json:"progress,omitempty" gorm:"embedded;embeddedPrefix:progress_"`
@@ -242,6 +245,10 @@ func (m *Host) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateMediaStatus(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validatePreloadStatus(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -413,7 +420,7 @@ func (m *Host) validateLogsCollectedAt(formats strfmt.Registry) error {
 		return nil
 	}
 
-	if err := validate.FormatOf("logs_collected_at", "body", "datetime", m.LogsCollectedAt.String(), formats); err != nil {
+	if err := validate.FormatOf("logs_collected_at", "body", "date-time", m.LogsCollectedAt.String(), formats); err != nil {
 		return err
 	}
 
@@ -442,7 +449,7 @@ func (m *Host) validateLogsStartedAt(formats strfmt.Registry) error {
 		return nil
 	}
 
-	if err := validate.FormatOf("logs_started_at", "body", "datetime", m.LogsStartedAt.String(), formats); err != nil {
+	if err := validate.FormatOf("logs_started_at", "body", "date-time", m.LogsStartedAt.String(), formats); err != nil {
 		return err
 	}
 
@@ -485,6 +492,23 @@ func (m *Host) validateMediaStatus(formats strfmt.Registry) error {
 
 	// value enum
 	if err := m.validateMediaStatusEnum("media_status", "body", *m.MediaStatus); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *Host) validatePreloadStatus(formats strfmt.Registry) error {
+	if swag.IsZero(m.PreloadStatus) { // not required
+		return nil
+	}
+
+	if err := m.PreloadStatus.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("preload_status")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("preload_status")
+		}
 		return err
 	}
 
@@ -763,6 +787,10 @@ func (m *Host) ContextValidate(ctx context.Context, formats strfmt.Registry) err
 		res = append(res, err)
 	}
 
+	if err := m.contextValidatePreloadStatus(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.contextValidateProgress(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -792,6 +820,20 @@ func (m *Host) contextValidateLogsInfo(ctx context.Context, formats strfmt.Regis
 			return ve.ValidateName("logs_info")
 		} else if ce, ok := err.(*errors.CompositeError); ok {
 			return ce.ValidateName("logs_info")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *Host) contextValidatePreloadStatus(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := m.PreloadStatus.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("preload_status")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("preload_status")
 		}
 		return err
 	}

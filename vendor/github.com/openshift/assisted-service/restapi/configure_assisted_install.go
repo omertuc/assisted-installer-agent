@@ -73,7 +73,10 @@ type InstallerAPI interface {
 	/* RegisterInfraEnv Creates a new OpenShift Discovery ISO. */
 	RegisterInfraEnv(ctx context.Context, params installer.RegisterInfraEnvParams) middleware.Responder
 
-	/* TransformClusterToDay2 Transforming cluster to day2 and allowing adding hosts */
+	/* TransformClusterToAddingHosts Transforms installed cluster to a state which allows adding hosts. */
+	TransformClusterToAddingHosts(ctx context.Context, params installer.TransformClusterToAddingHostsParams) middleware.Responder
+
+	/* TransformClusterToDay2 Deprecated, maintained for legacy purposes. Does the same thing as allow-add-hosts. Use allow-add-hosts instead. */
 	TransformClusterToDay2(ctx context.Context, params installer.TransformClusterToDay2Params) middleware.Responder
 
 	/* UnbindHost Unbind host to a cluster */
@@ -201,6 +204,9 @@ type InstallerAPI interface {
 
 	/* V2UpdateHostLogsProgress Update log collection state and progress. */
 	V2UpdateHostLogsProgress(ctx context.Context, params installer.V2UpdateHostLogsProgressParams) middleware.Responder
+
+	/* V2UpdateHostMediaPreloadStatus Update media preload status. */
+	V2UpdateHostMediaPreloadStatus(ctx context.Context, params installer.V2UpdateHostMediaPreloadStatusParams) middleware.Responder
 
 	/* V2UploadClusterIngressCert Transfer the ingress certificate for the cluster. */
 	V2UploadClusterIngressCert(ctx context.Context, params installer.V2UploadClusterIngressCertParams) middleware.Responder
@@ -422,6 +428,11 @@ func HandlerAPI(c Config) (http.Handler, *operations.AssistedInstallAPI, error) 
 		ctx := params.HTTPRequest.Context()
 		ctx = storeAuth(ctx, principal)
 		return c.InstallerAPI.RegisterInfraEnv(ctx, params)
+	})
+	api.InstallerTransformClusterToAddingHostsHandler = installer.TransformClusterToAddingHostsHandlerFunc(func(params installer.TransformClusterToAddingHostsParams, principal interface{}) middleware.Responder {
+		ctx := params.HTTPRequest.Context()
+		ctx = storeAuth(ctx, principal)
+		return c.InstallerAPI.TransformClusterToAddingHosts(ctx, params)
 	})
 	api.InstallerTransformClusterToDay2Handler = installer.TransformClusterToDay2HandlerFunc(func(params installer.TransformClusterToDay2Params, principal interface{}) middleware.Responder {
 		ctx := params.HTTPRequest.Context()
@@ -697,6 +708,11 @@ func HandlerAPI(c Config) (http.Handler, *operations.AssistedInstallAPI, error) 
 		ctx := params.HTTPRequest.Context()
 		ctx = storeAuth(ctx, principal)
 		return c.InstallerAPI.V2UpdateHostLogsProgress(ctx, params)
+	})
+	api.InstallerV2UpdateHostMediaPreloadStatusHandler = installer.V2UpdateHostMediaPreloadStatusHandlerFunc(func(params installer.V2UpdateHostMediaPreloadStatusParams, principal interface{}) middleware.Responder {
+		ctx := params.HTTPRequest.Context()
+		ctx = storeAuth(ctx, principal)
+		return c.InstallerAPI.V2UpdateHostMediaPreloadStatus(ctx, params)
 	})
 	api.InstallerV2UploadClusterIngressCertHandler = installer.V2UploadClusterIngressCertHandlerFunc(func(params installer.V2UploadClusterIngressCertParams, principal interface{}) middleware.Responder {
 		ctx := params.HTTPRequest.Context()

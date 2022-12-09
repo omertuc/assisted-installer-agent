@@ -36,6 +36,7 @@ require (
 
 require (
 	github.com/go-logr/stdr v1.2.2 // indirect
+	github.com/krishicks/yaml-patch v0.0.10 // indirect
 	go.opentelemetry.io/otel v1.11.1 // indirect
 	go.opentelemetry.io/otel/trace v1.11.1 // indirect
 )
@@ -69,7 +70,7 @@ require (
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/go-openapi/analysis v0.21.2 // indirect
-	github.com/go-openapi/errors v0.20.2 // indirect
+	github.com/go-openapi/errors v0.20.3 // indirect
 	github.com/go-openapi/jsonpointer v0.19.5 // indirect
 	github.com/go-openapi/jsonreference v0.20.0 // indirect
 	github.com/go-openapi/loads v0.21.1 // indirect
@@ -172,8 +173,9 @@ replace (
 	github.com/metal3-io/baremetal-operator => github.com/openshift/baremetal-operator v0.0.0-20210527161605-4e331bfd4b1d
 	github.com/metal3-io/baremetal-operator/apis => github.com/openshift/baremetal-operator/apis v0.0.0-20220217140404-6b1ecb71984f
 	github.com/metal3-io/baremetal-operator/pkg/hardwareutils => github.com/openshift/baremetal-operator/pkg/hardwareutils v0.0.0-20220217140404-6b1ecb71984f
-	github.com/openshift/assisted-service/api => github.com/openshift/assisted-service/api v0.0.0-20220823173824-8dcdef86a629
-	github.com/openshift/assisted-service/models => github.com/openshift/assisted-service/models v0.0.0-20220823173824-8dcdef86a629
+	github.com/openshift/assisted-service => ./assisted-service
+	github.com/openshift/assisted-service/api => ./assisted-service/api
+	github.com/openshift/assisted-service/models => ./assisted-service/models
 	sigs.k8s.io/cluster-api-provider-aws => github.com/openshift/cluster-api-provider-aws v0.2.1-0.20201022175424-d30c7a274820
 	sigs.k8s.io/cluster-api-provider-azure => github.com/openshift/cluster-api-provider-azure v0.1.0-alpha.3.0.20201016155852-4090a6970205
 )

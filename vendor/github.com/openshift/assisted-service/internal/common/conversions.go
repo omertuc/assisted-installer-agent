@@ -38,6 +38,13 @@ func LogStateValue(l *models.LogsState) models.LogsState {
 	return *l
 }
 
+func MediaPreloadValue(l *models.PreloadStatus) models.PreloadStatus {
+	if l == nil {
+		return ""
+	}
+	return *l
+}
+
 func StrFmtUUIDVal(u *strfmt.UUID) strfmt.UUID {
 	if u == nil {
 		return ""

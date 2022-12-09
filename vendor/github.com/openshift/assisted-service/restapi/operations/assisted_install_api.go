@@ -84,6 +84,9 @@ func NewAssistedInstallAPI(spec *loads.Document) *AssistedInstallAPI {
 		InstallerRegisterInfraEnvHandler: installer.RegisterInfraEnvHandlerFunc(func(params installer.RegisterInfraEnvParams, principal interface{}) middleware.Responder {
 			return middleware.NotImplemented("operation installer.RegisterInfraEnv has not yet been implemented")
 		}),
+		InstallerTransformClusterToAddingHostsHandler: installer.TransformClusterToAddingHostsHandlerFunc(func(params installer.TransformClusterToAddingHostsParams, principal interface{}) middleware.Responder {
+			return middleware.NotImplemented("operation installer.TransformClusterToAddingHosts has not yet been implemented")
+		}),
 		InstallerTransformClusterToDay2Handler: installer.TransformClusterToDay2HandlerFunc(func(params installer.TransformClusterToDay2Params, principal interface{}) middleware.Responder {
 			return middleware.NotImplemented("operation installer.TransformClusterToDay2 has not yet been implemented")
 		}),
@@ -249,6 +252,9 @@ func NewAssistedInstallAPI(spec *loads.Document) *AssistedInstallAPI {
 		InstallerV2UpdateHostLogsProgressHandler: installer.V2UpdateHostLogsProgressHandlerFunc(func(params installer.V2UpdateHostLogsProgressParams, principal interface{}) middleware.Responder {
 			return middleware.NotImplemented("operation installer.V2UpdateHostLogsProgress has not yet been implemented")
 		}),
+		InstallerV2UpdateHostMediaPreloadStatusHandler: installer.V2UpdateHostMediaPreloadStatusHandlerFunc(func(params installer.V2UpdateHostMediaPreloadStatusParams, principal interface{}) middleware.Responder {
+			return middleware.NotImplemented("operation installer.V2UpdateHostMediaPreloadStatus has not yet been implemented")
+		}),
 		InstallerV2UploadClusterIngressCertHandler: installer.V2UploadClusterIngressCertHandlerFunc(func(params installer.V2UploadClusterIngressCertParams, principal interface{}) middleware.Responder {
 			return middleware.NotImplemented("operation installer.V2UploadClusterIngressCert has not yet been implemented")
 		}),
@@ -362,6 +368,8 @@ type AssistedInstallAPI struct {
 	InstallerRegenerateInfraEnvSigningKeyHandler installer.RegenerateInfraEnvSigningKeyHandler
 	// InstallerRegisterInfraEnvHandler sets the operation handler for the register infra env operation
 	InstallerRegisterInfraEnvHandler installer.RegisterInfraEnvHandler
+	// InstallerTransformClusterToAddingHostsHandler sets the operation handler for the transform cluster to adding hosts operation
+	InstallerTransformClusterToAddingHostsHandler installer.TransformClusterToAddingHostsHandler
 	// InstallerTransformClusterToDay2Handler sets the operation handler for the transform cluster to day2 operation
 	InstallerTransformClusterToDay2Handler installer.TransformClusterToDay2Handler
 	// InstallerUnbindHostHandler sets the operation handler for the unbind host operation
@@ -472,6 +480,8 @@ type AssistedInstallAPI struct {
 	InstallerV2UpdateHostInstallerArgsHandler installer.V2UpdateHostInstallerArgsHandler
 	// InstallerV2UpdateHostLogsProgressHandler sets the operation handler for the v2 update host logs progress operation
 	InstallerV2UpdateHostLogsProgressHandler installer.V2UpdateHostLogsProgressHandler
+	// InstallerV2UpdateHostMediaPreloadStatusHandler sets the operation handler for the v2 update host media preload status operation
+	InstallerV2UpdateHostMediaPreloadStatusHandler installer.V2UpdateHostMediaPreloadStatusHandler
 	// InstallerV2UploadClusterIngressCertHandler sets the operation handler for the v2 upload cluster ingress cert operation
 	InstallerV2UploadClusterIngressCertHandler installer.V2UploadClusterIngressCertHandler
 
@@ -605,6 +615,9 @@ func (o *AssistedInstallAPI) Validate() error {
 	}
 	if o.InstallerRegisterInfraEnvHandler == nil {
 		unregistered = append(unregistered, "installer.RegisterInfraEnvHandler")
+	}
+	if o.InstallerTransformClusterToAddingHostsHandler == nil {
+		unregistered = append(unregistered, "installer.TransformClusterToAddingHostsHandler")
 	}
 	if o.InstallerTransformClusterToDay2Handler == nil {
 		unregistered = append(unregistered, "installer.TransformClusterToDay2Handler")
@@ -771,6 +784,9 @@ func (o *AssistedInstallAPI) Validate() error {
 	if o.InstallerV2UpdateHostLogsProgressHandler == nil {
 		unregistered = append(unregistered, "installer.V2UpdateHostLogsProgressHandler")
 	}
+	if o.InstallerV2UpdateHostMediaPreloadStatusHandler == nil {
+		unregistered = append(unregistered, "installer.V2UpdateHostMediaPreloadStatusHandler")
+	}
 	if o.InstallerV2UploadClusterIngressCertHandler == nil {
 		unregistered = append(unregistered, "installer.V2UploadClusterIngressCertHandler")
 	}
@@ -935,6 +951,10 @@ func (o *AssistedInstallAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/v2/infra-envs"] = installer.NewRegisterInfraEnv(o.context, o.InstallerRegisterInfraEnvHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/v2/clusters/{cluster_id}/actions/allow-add-hosts"] = installer.NewTransformClusterToAddingHosts(o.context, o.InstallerTransformClusterToAddingHostsHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
@@ -1155,6 +1175,10 @@ func (o *AssistedInstallAPI) initHandlerCache() {
 		o.handlers["PUT"] = make(map[string]http.Handler)
 	}
 	o.handlers["PUT"]["/v2/infra-envs/{infra_env_id}/hosts/{host_id}/logs-progress"] = installer.NewV2UpdateHostLogsProgress(o.context, o.InstallerV2UpdateHostLogsProgressHandler)
+	if o.handlers["PUT"] == nil {
+		o.handlers["PUT"] = make(map[string]http.Handler)
+	}
+	o.handlers["PUT"]["/v2/infra-envs/{infra_env_id}/hosts/{host_id}/media-preload-status"] = installer.NewV2UpdateHostMediaPreloadStatus(o.context, o.InstallerV2UpdateHostMediaPreloadStatusHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

@@ -17,6 +17,7 @@ type serviceAPI interface {
 	RegisterHost(s *session.InventorySession) (*models.HostRegistrationResponse, error)
 	GetNextSteps(s *session.InventorySession) (*models.Steps, error)
 	PostStepReply(s *session.InventorySession, reply *models.StepReply) error
+	PostPreloadStatus(s *session.InventorySession, status *models.PreloadStatus) error
 }
 
 type v2ServiceAPI struct {
@@ -73,7 +74,20 @@ func (v *v2ServiceAPI) PostStepReply(s *session.InventorySession, reply *models.
 	return err
 }
 
-func newServiceAPI(agentConfig *config.AgentConfig) serviceAPI {
+func (v *v2ServiceAPI) PostPreloadStatus(s *session.InventorySession, status *models.PreloadStatus) error {
+	params := installer.V2UpdateHostMediaPreloadStatusParams{
+		HostID:                   strfmt.UUID(v.agentConfig.HostID),
+		InfraEnvID:               strfmt.UUID(v.agentConfig.InfraEnvID),
+		MediaPreloadStatusParams: &models.MediaPreloadStatusParams{
+			PreloadStatus: status,
+		},
+	}
+
+	_, err := s.Client().Installer.V2UpdateHostMediaPreloadStatus(s.Context(), &params)
+	return err
+}
+
+func NewServiceAPI(agentConfig *config.AgentConfig) serviceAPI {
 	return &v2ServiceAPI{
 		agentConfig: agentConfig,
 	}
