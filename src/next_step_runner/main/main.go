@@ -105,6 +105,7 @@ func preloadMedia(ctx context.Context, cancel context.CancelFunc, agentConfig *c
 
 	api.PostPreloadStatus(inventorySession, models.NewPreloadStatus(models.PreloadStatusPreloading))
 
+L:
 	for {
 		select {
 		case <-ctx.Done():
@@ -131,9 +132,11 @@ func preloadMedia(ctx context.Context, cancel context.CancelFunc, agentConfig *c
 			}
 
 			api.PostPreloadStatus(inventorySession, models.NewPreloadStatus(models.PreloadStatusPreloaded))
-			break
+			break L
 		}
 	}
+
+	ctx.Done()
 }
 
 func main() {

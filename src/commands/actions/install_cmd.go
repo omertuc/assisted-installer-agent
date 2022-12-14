@@ -143,9 +143,9 @@ func (a *install) getFullInstallerCommand() string {
 
 	if a.installParams.InstallerArgs != "" {
 		installerCmdArgs = append(installerCmdArgs, "--installer-args", a.installParams.InstallerArgs)
-		installerCmdArgs = append(installerCmdArgs, "--image-file=/tmp/assisted-preloaded-metal-image")
+		installerCmdArgs = append(installerCmdArgs, `["--image-file=/tmp/assisted-preloaded-metal-image"]`)
 	} else {
-		installerCmdArgs = append(installerCmdArgs, "--installer-args", "--image-file=/tmp/assisted-preloaded-metal-image")
+		installerCmdArgs = append(installerCmdArgs, "--installer-args", `["--image-file=/tmp/assisted-preloaded-metal-image"]`)
 	}
 
 	proxyArgs := getProxyArguments(a.installParams.Proxy)
